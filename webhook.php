@@ -1,6 +1,5 @@
 <?php
 $access_token = 'zJVzvgBKb7OrZ3tGN/NwjssACGGXEGZ06rJIqRQE2N5l9+atKqCcMAEWMxE3rb7Ep+90vMDcDJuRhI+87I8YrvY1KFzkWWeQDR0dplvRwthvp51vdi6MBSFJyyvofoN1z8TEHmMp9O+juPg8LofhegdB04t89/1O/w1cDnyilFU=';
-
 // รับข้อมูลจาก LINE
 $content = file_get_contents('php://input');
 $events = json_decode($content, true);
@@ -42,3 +41,4 @@ if (!empty($events['events'])) {
 }
 
 echo json_encode(["status" => "ok"]);
+
