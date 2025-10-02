@@ -12,17 +12,7 @@ $password = '4093692';
 
 
 
-try {
 
-    $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $username, $password);
-
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-} catch (PDOException $e) {
-
-    die("Database connection failed: " . $e->getMessage());
-
-}
 
 
 
@@ -213,5 +203,6 @@ if (!empty($params['orders_date'])) {
 }
 
 http_response_code(200);
+
 
 
