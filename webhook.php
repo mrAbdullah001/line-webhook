@@ -31,6 +31,40 @@ try {
 $content = file_get_contents('php://input');
 $events = json_decode($content, true);
 
+try {
+    $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $username, $password);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch (PDOException $e) {
+    // ถ้าเชื่อมต่อ DB ไม่สำเร็จ ให้ส่งข้อความกลับไป LINE
+    if (!empty($events['events'])) {
+        foreach ($events['events'] as $event) {
+            if ($event['type'] === 'postback') {
+                $replyToken = $event['replyToken'];
+                $messages = [[ 'type' => 'text', 'text' => "❌ เชื่อมต่อฐานข้อมูลไม่สำเร็จ" ]];
+                $url = 'https://api.line.me/v2/bot/message/reply';
+                $headers = [
+                    'Content-Type: application/json',
+                    'Authorization: Bearer ' . $access_token
+                ];
+                $post_data = json_encode([
+                    'replyToken' => $replyToken,
+                    'messages' => $messages
+                ], JSON_UNESCAPED_UNICODE);
+                $ch = curl_init($url);
+                curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                curl_setopt($ch, CURLOPT_POSTFIELDS, $post_data);
+                curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+                curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
+                $result = curl_exec($ch);
+                curl_close($ch);
+            }
+        }
+    }
+    http_response_code(500);
+    exit;
+}
+
 if (!empty($events['events'])) {
     foreach ($events['events'] as $event) {
         if ($event['type'] === 'postback') {
@@ -179,3 +213,4 @@ if (!empty($params['orders_date'])) {
 }
 
 http_response_code(200);
+
