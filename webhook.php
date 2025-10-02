@@ -8,7 +8,7 @@ $dbname = 'if0_40067559_orders';
 
 $username = 'if0_40067559';
 
-$password = '40936923742';
+$password = '4093692';
 
 
 
@@ -213,4 +213,5 @@ if (!empty($params['orders_date'])) {
 }
 
 http_response_code(200);
+
 
