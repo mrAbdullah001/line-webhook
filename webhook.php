@@ -120,11 +120,64 @@ if (!empty($events['events'])) {
             }
 
             // ... (โค้ด orders_date เหมือนเดิม แนะนำให้ใส่ log ด้วยแบบเดียวกัน)
+
+            // ✅ เพิ่มตรงนี้ต่อจาก summary_date 
+if (!empty($params['orders_date'])) {
+    $date = $params['orders_date'];
+
+    // ดึงข้อมูล orders ในวันนั้น
+    $sql = "SELECT id, customer_name, address, phone, price, quantity, flavors, note 
+        FROM orders 
+        WHERE delivery_date=?
+        ORDER BY price ASC, customer_name ASC, address ASC, id ASC";
+
+
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute([$date]);
+    $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    if (!$orders) {
+        $replyText = "ไม่มีออเดอร์วันที่ ".date('d/m/Y', strtotime($date));
+    } else {
+        $replyText = "📋 แสดงออเดอร์วันที่ ".date('d/m/Y', strtotime($date))."\n\n";
+        foreach ($orders as $o) {
+            $replyText .= "🆔 {$o['id']}\n";
+            $replyText .= "💰 {$o['price']} บาท | 🍦 {$o['quantity']} บาท\n";
+            $replyText .= "👤 {$o['customer_name']} | 🏠 {$o['address']}\n";
+            $replyText .= "📞 {$o['phone']}\n";
+            if (!empty($o['note'])) {
+                $replyText .= "📝 {$o['note']}\n";
+            }
+            $replyText .= "----------------------\n";
+        }
+    }
+
+    // ส่งกลับ LINE
+    $messages = [[ 'type' => 'text', 'text' => $replyText ]];
+    $url = 'https://api.line.me/v2/bot/message/reply';
+    $headers = [
+        'Content-Type: application/json',
+        'Authorization: Bearer ' . $access_token
+    ];
+    $post_data = json_encode([
+        'replyToken' => $replyToken,
+        'messages' => $messages
+    ], JSON_UNESCAPED_UNICODE);
+    $ch = curl_init($url);
+    curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, $post_data);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
+    $result = curl_exec($ch);
+    curl_close($ch);
+}
         }
     }
 }
 
 http_response_code(200);
+
 
 
 
