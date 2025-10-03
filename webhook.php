@@ -1,5 +1,29 @@
 <?php
 $access_token = 'zJVzvgBKb7OrZ3tGN/NwjssACGGXEGZ06rJIqRQE2N5l9+atKqCcMAEWMxE3rb7Ep+90vMDcDJuRhI+87I8YrvY1KFzkWWeQDR0dplvRwthvp51vdi6MBSFJyyvofoN1z8TEHmMp9O+juPg8LofhegdB04t89/1O/w1cDnyilFU=';
+
+$host = 'sql12.freesqldatabase.com';
+
+$dbname = 'sql12801123';
+
+$username = 'sql12801123';
+
+$password = 'x2jaUxJ2dN';
+
+
+
+try {
+
+    $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $username, $password);
+
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+} catch (PDOException $e) {
+
+    die("Database connection failed: " . $e->getMessage());
+
+}
+
+
 // รับข้อมูลจาก LINE
 $content = file_get_contents('php://input');
 $events = json_decode($content, true);
@@ -41,4 +65,5 @@ if (!empty($events['events'])) {
 }
 
 echo json_encode(["status" => "ok"]);
+
 
